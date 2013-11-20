@@ -19,9 +19,10 @@ This plugin does not emit, just writes into the log file as
 
     Either of second/minute/hour/day. Default: minute
 
-## ChangeLog
+## Relatives
 
-See [CHANGELOG.md](CHANGELOG.md) for details.
+There is a [fluent-plugin-flowcounter](https://github.com/tagomoris/fluent-plugin-flowcounter), 
+but I needed a very very simple plugin to use for performance evaluation. 
 
 ## Contributing
 

@@ -17,7 +17,11 @@ This plugin does not emit, just writes into the log file as
 
 - unit
 
-    Either of second/minute/hour/day. Default: minute
+    One of second/minute/hour/day. Default: minute
+
+- count
+
+    One of num/byte. Default: num
 
 ## Relatives
 

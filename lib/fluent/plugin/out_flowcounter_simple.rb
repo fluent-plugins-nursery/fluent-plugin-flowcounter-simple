@@ -1,6 +1,7 @@
 class Fluent::FlowCounterSimpleOutput < Fluent::Output
   Fluent::Plugin.register_output('flowcounter_simple', self)
 
+  config_param :count, :string, :default => 'num'
   config_param :unit, :string, :default => 'second'
 
   attr_accessor :last_checked
@@ -8,14 +9,31 @@ class Fluent::FlowCounterSimpleOutput < Fluent::Output
   def configure(conf)
     super
 
-    @unit = case @unit
-            when 'second' then :second
-            when 'minute' then :minute
-            when 'hour' then :hour
-            when 'day' then :day
-            else
-              raise Fluent::ConfigError, "flowcounter-simple unit allows second/minute/hour/day"
-            end
+    @count_proc =
+      case @count
+      when 'num'  then Proc.new {|record| 1 }
+      when 'byte' then Proc.new {|record| record.to_msgpack.size }
+      else
+        raise Fluent::ConfigError, "flowcounter-simple count allows num/byte"
+      end
+    @unit =
+      case @unit
+      when 'second' then :second
+      when 'minute' then :minute
+      when 'hour' then :hour
+      when 'day' then :day
+      else
+        raise Fluent::ConfigError, "flowcounter-simple unit allows second/minute/hour/day"
+      end
+    @tick =
+      case @unit
+      when :second then 1
+      when :minute then 60
+      when :hour then 3600
+      when :day then 86400
+      else
+        raise RuntimeError, "@unit must be one of second/minute/hour/day"
+      end
 
     @count = 0
     @mutex = Mutex.new
@@ -54,17 +72,9 @@ class Fluent::FlowCounterSimpleOutput < Fluent::Output
   def watch
     # instance variable, and public accessable, for test
     @last_checked = Fluent::Engine.now
-    tick = case @unit
-           when :second then 1
-           when :minute then 60
-           when :hour then 3600
-           when :day then 86400
-           else
-             raise RuntimeError, "@unit must be one of second/minute/hour/day"
-           end
     while true
       sleep 0.1
-      if Fluent::Engine.now - @last_checked >= tick
+      if Fluent::Engine.now - @last_checked >= @tick
         now = Fluent::Engine.now
         flush_emit(now - @last_checked)
         @last_checked = now
@@ -75,7 +85,7 @@ class Fluent::FlowCounterSimpleOutput < Fluent::Output
   def emit(tag, es, chain)
     count = 0
     es.each {|time,record|
-      count += 1
+      count += @count_proc.call(record)
     }
     countup(count)
 

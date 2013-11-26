@@ -11,13 +11,17 @@ Simple Fluentd Plugin to count number of messages and outputs to log
 
 This plugin does not emit, just writes into the log file as
 
-    out_flowcounter_simple: 30 / second
+    plugin:out_flowcounter_simple  count:30  indicator:num  unit:second
 
 ## Parameters
 
 - unit
 
-    Either of second/minute/hour/day. Default: minute
+    One of second/minute/hour/day. Default: minute
+
+- indicator
+
+    One of num/byte. Default: num
 
 ## Relatives
 

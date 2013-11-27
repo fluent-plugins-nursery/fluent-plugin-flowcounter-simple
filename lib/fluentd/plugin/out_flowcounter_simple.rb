@@ -1,5 +1,5 @@
-class Fluent::FlowCounterSimpleOutput < Fluent::Output
-  Fluent::Plugin.register_output('flowcounter_simple', self)
+class Fluentd::Plugin::FlowCounterSimpleOutput < Fluentd::Plugin::Output
+  Fluentd::Plugin.register_output('flowcounter_simple', self)
 
   config_param :count, :string, :default => 'num'
   config_param :unit, :string, :default => 'second'
@@ -59,8 +59,7 @@ class Fluent::FlowCounterSimpleOutput < Fluent::Output
   def flush_emit(step)
     count, @count = @count, 0
     if count > 0
-      $log.write "out_flowcounter_simple: #{count} / #{@unit}\n"
-      $log.flush
+      log.warn "#{count} / #{@unit}"
     end
   end
 
@@ -71,24 +70,22 @@ class Fluent::FlowCounterSimpleOutput < Fluent::Output
 
   def watch
     # instance variable, and public accessable, for test
-    @last_checked = Fluent::Engine.now
+    @last_checked = Time.now.to_i
     while true
       sleep 0.1
-      if Fluent::Engine.now - @last_checked >= @tick
-        now = Fluent::Engine.now
+      if Time.now.to_i - @last_checked >= tick
+        now = Time.now.to_i
         flush_emit(now - @last_checked)
         @last_checked = now
       end
     end
   end
 
-  def emit(tag, es, chain)
+  def emits(tag, es)
     count = 0
     es.each {|time,record|
       count += @count_proc.call(record)
     }
     countup(count)
-
-    chain.next
   end
 end

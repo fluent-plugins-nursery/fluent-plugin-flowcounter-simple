@@ -23,6 +23,10 @@ This plugin does not emit, just writes into the log file as
 
     One of num/byte. Default: num
 
+- comment
+
+    Just a comment. You may use this to mark where you put flowcounter_simple.
+
 ## Relatives
 
 There is a [fluent-plugin-flowcounter](https://github.com/tagomoris/fluent-plugin-flowcounter), 

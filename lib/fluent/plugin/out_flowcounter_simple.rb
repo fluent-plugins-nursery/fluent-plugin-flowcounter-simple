@@ -3,6 +3,7 @@ class Fluent::FlowCounterSimpleOutput < Fluent::Output
 
   config_param :indicator, :string, :default => 'num'
   config_param :unit, :string, :default => 'second'
+  config_param :comment, :string, :default => nil
 
   attr_accessor :last_checked
 
@@ -35,6 +36,13 @@ class Fluent::FlowCounterSimpleOutput < Fluent::Output
         raise RuntimeError, "@unit must be one of second/minute/hour/day"
       end
 
+    @output_proc =
+      if @comment
+        Proc.new {|count| "plugin:out_flowcounter_simple\tcount:#{count}\tindicator:#{@indicator}\tunit:#{@unit}\tcomment:#{@comment}" }
+      else
+        Proc.new {|count| "plugin:out_flowcounter_simple\tcount:#{count}\tindicator:#{@indicator}\tunit:#{@unit}" }
+      end
+
     @count = 0
     @mutex = Mutex.new
   end
@@ -59,7 +67,7 @@ class Fluent::FlowCounterSimpleOutput < Fluent::Output
   def flush_emit(step)
     count, @count = @count, 0
     if count > 0
-      $log.info "plugin:out_flowcounter_simple\tcount:#{count}\tindicator:#{@indicator}\tunit:#{@unit}"
+      $log.info @output_proc.call(count)
     end
   end
 

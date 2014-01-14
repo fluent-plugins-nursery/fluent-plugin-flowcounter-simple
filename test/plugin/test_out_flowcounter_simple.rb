@@ -54,6 +54,19 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
     assert( log.include?("count:3360"), log )
   end
 
+  def test_comment
+    d1 = create_driver(CONFIG + %[comment foobar], 'test.tag1')
+    d1.run do
+      1.times do
+        d1.emit({'message'=> 'a' * 100})
+        d1.emit({'message'=> 'b' * 100})
+        d1.emit({'message'=> 'c' * 100})
+      end
+    end
+    log = capture_log { d1.instance.flush_emit(60) }
+    assert( log.include?("comment:foobar"), log )
+  end
+
 private
 
   def capture_log

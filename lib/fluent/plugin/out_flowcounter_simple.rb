@@ -1,6 +1,11 @@
 class Fluent::FlowCounterSimpleOutput < Fluent::Output
   Fluent::Plugin.register_output('flowcounter_simple', self)
 
+  # To support log_level option implemented by Fluentd v0.10.43
+  unless method_defined?(:log)
+    define_method("log") { $log }
+  end
+
   config_param :indicator, :string, :default => 'num'
   config_param :unit, :string, :default => 'second'
   config_param :comment, :string, :default => nil
@@ -67,7 +72,7 @@ class Fluent::FlowCounterSimpleOutput < Fluent::Output
   def flush_emit(step)
     count, @count = @count, 0
     if count > 0
-      $log.info @output_proc.call(count)
+      log.info @output_proc.call(count)
     end
   end
 

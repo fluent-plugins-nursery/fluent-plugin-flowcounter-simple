@@ -7,7 +7,7 @@ Simple Fluentd Plugin to count number of messages and outputs to log
     <match foo.bar.**>
       type flowcounter_simple
       unit second
-    </source>
+    </match>
 
 This plugin does not emit, just writes into the log file as
 

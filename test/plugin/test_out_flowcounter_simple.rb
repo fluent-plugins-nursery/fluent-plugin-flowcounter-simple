@@ -37,8 +37,8 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
         d1.emit({'message'=> 'c' * 100})
       end
     end
-    log = capture_log { d1.instance.flush_emit(60) }
-    assert( log.include?("count:30"), log )
+    out = capture_log(d1.instance.log) { d1.instance.flush_emit(60) }
+    assert( out.include?("count:30"), out )
   end
 
   def test_byte
@@ -50,8 +50,8 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
         d1.emit({'message'=> 'c' * 100})
       end
     end
-    log = capture_log { d1.instance.flush_emit(60) }
-    assert( log.include?("count:3360"), log )
+    out = capture_log(d1.instance.log) { d1.instance.flush_emit(60) }
+    assert( out.include?("count:3360"), out )
   end
 
   def test_comment
@@ -63,18 +63,18 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
         d1.emit({'message'=> 'c' * 100})
       end
     end
-    log = capture_log { d1.instance.flush_emit(60) }
-    assert( log.include?("comment:foobar"), log )
+    out = capture_log(d1.instance.log) { d1.instance.flush_emit(60) }
+    assert( out.include?("comment:foobar"), out )
   end
 
 private
 
-  def capture_log
-    tmp = $log.out
-    $log.out = StringIO.new
+  def capture_log(log)
+    tmp = log.out
+    log.out = StringIO.new
     yield
-    return $log.out.string
+    return log.out.string
   ensure
-    $log.out = tmp
+    log.out = tmp
   end
 end

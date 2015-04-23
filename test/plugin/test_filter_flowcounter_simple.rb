@@ -24,9 +24,9 @@ class FlowCounterSimpleFilterTest < Test::Unit::TestCase
       msgs << {'message'=> 'b' * 100}
     end
     d = create_driver
-    filtered, log = filter(d, msgs)
+    filtered, out = filter(d, msgs)
     assert_equal msgs, filtered
-    assert( log.include?("count:20"), log )
+    assert( out.include?("count:20"), out )
   end
 
   private
@@ -39,20 +39,11 @@ class FlowCounterSimpleFilterTest < Test::Unit::TestCase
         d.filter(msg, @time)
       }
     }
-    log = capture_log(d.instance.output.log) do
+    out = capture_log(d.instance.output.log) do
       d.instance.flush_emit(0)
     end
     filtered = d.filtered_as_array
     filtered_msgs = filtered.map {|m| m[2] }
-    [filtered_msgs, log]
+    [filtered_msgs, out]
   end
-
-  def capture_log(log)
-    tmp = log.out
-    log.out = StringIO.new
-    yield
-    return log.out.string
-  ensure
-    log.out = tmp
-  end
-end if defined?(Fluent::Test::FilterTestDriver)
+end if defined?(Fluent::Filter)

@@ -16,4 +16,12 @@ require 'fluent/plugin/out_flowcounter_simple'
 require 'fluent/plugin/filter_flowcounter_simple'
 
 class Test::Unit::TestCase
+  def capture_log(log)
+    tmp = log.out
+    log.out = StringIO.new
+    yield
+    return log.out.string
+  ensure
+    log.out = tmp
+  end
 end

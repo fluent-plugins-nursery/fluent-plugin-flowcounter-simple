@@ -9,3 +9,9 @@ Rake::TestTask.new(:test) do |test|
 end
 
 task :default => :test
+
+desc 'Open an irb session preloaded with the gem library'
+task :console do
+      sh 'irb -rubygems -I lib -r"fluent/load"'
+end
+task :c => :console

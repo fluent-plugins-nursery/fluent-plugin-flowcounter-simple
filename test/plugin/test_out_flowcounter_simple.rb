@@ -1,4 +1,4 @@
-require 'helper'
+require_relative '../helper'
 
 class FlowCounterSimpleOutputTest < Test::Unit::TestCase
   def setup
@@ -67,7 +67,7 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
     assert( out.include?("comment:foobar"), out )
   end
 
-private
+  private
 
   def capture_log(log)
     tmp = log.out

@@ -1,6 +1,12 @@
+## 0.0.4 (2015/04/24)
+
+Enhancements:
+
+* Add filter plugin
+
 ## 0.0.3 (2014/02/04)
 
-Enhancement:
+Enhancements:
 
 * Support `log_level` option of Fleuntd v0.10.43
 

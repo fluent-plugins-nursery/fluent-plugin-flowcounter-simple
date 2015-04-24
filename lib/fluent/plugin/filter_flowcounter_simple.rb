@@ -1,4 +1,4 @@
-# I'm lazy to to implement filter plugin. Use output plugin instance
+# Be lazy to to implement filter plugin, use output plugin instance
 require_relative 'out_flowcounter_simple'
 require 'forwardable'
 

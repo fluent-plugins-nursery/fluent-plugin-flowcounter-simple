@@ -1,8 +1,9 @@
 # Be lazy to to implement filter plugin, use output plugin instance
 require_relative 'out_flowcounter_simple'
 require 'forwardable'
+require 'fluent/plugin/filter'
 
-class Fluent::FlowCounterSimpleFilter < Fluent::Filter
+class Fluent::Plugin::FlowCounterSimpleFilter < Fluent::Plugin::Filter
   Fluent::Plugin.register_filter('flowcounter_simple', self)
 
   extend Forwardable
@@ -11,11 +12,11 @@ class Fluent::FlowCounterSimpleFilter < Fluent::Filter
 
   def initialize
     super
-    @output = Fluent::FlowCounterSimpleOutput.new
+    @output = Fluent::Plugin::FlowCounterSimpleOutput.new
   end
 
   def filter_stream(tag, es)
-    @output.emit(tag, es, Fluent::NullOutputChain.instance)
+    @output.process(tag, es)
     es
   end
-end if defined?(Fluent::Filter)
+end

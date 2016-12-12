@@ -1,5 +1,9 @@
-class Fluent::FlowCounterSimpleOutput < Fluent::Output
+require 'fluent/plugin/output'
+
+class Fluent::Plugin::FlowCounterSimpleOutput < Fluent::Plugin::Output
   Fluent::Plugin.register_output('flowcounter_simple', self)
+
+  helpers :event_emitter
 
   # To support log_level option implemented by Fluentd v0.10.43
   unless method_defined?(:log)
@@ -94,13 +98,11 @@ class Fluent::FlowCounterSimpleOutput < Fluent::Output
     end
   end
 
-  def emit(tag, es, chain)
+  def process(tag, es)
     count = 0
     es.each {|time,record|
       count += @indicator_proc.call(record)
     }
     countup(count)
-
-    chain.next
   end
 end

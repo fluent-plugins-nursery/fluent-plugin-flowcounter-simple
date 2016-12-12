@@ -15,6 +15,16 @@ require 'fluent/test'
 require 'fluent/plugin/out_flowcounter_simple'
 require 'fluent/plugin/filter_flowcounter_simple'
 
+# Test stub for log.info
+class Fluent::Log
+  alias_method :info_raw, :info
+
+  def info(message)
+    self.write(message)
+    self.flush
+  end
+end
+
 class Test::Unit::TestCase
   def capture_log(log, &block)
     tmp = log.out

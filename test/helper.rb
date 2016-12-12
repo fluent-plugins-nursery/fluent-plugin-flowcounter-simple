@@ -17,8 +17,6 @@ require 'fluent/plugin/filter_flowcounter_simple'
 
 # Test stub for log.info
 class Fluent::Log
-  alias_method :info_raw, :info
-
   def info(message)
     self.write(message)
     self.flush

@@ -16,16 +16,16 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
 
   def test_configure
     assert_nothing_raised {
-      d = create_driver('')
+      create_driver('')
     }
     assert_nothing_raised {
-      d = create_driver(CONFIG)
+      create_driver(CONFIG)
     }
     assert_nothing_raised {
-      d = create_driver(CONFIG + %[indicator num])
+      create_driver(CONFIG + %[indicator num])
     }
     assert_nothing_raised {
-      d = create_driver(CONFIG + %[indicator byte])
+      create_driver(CONFIG + %[indicator byte])
     }
   end
 

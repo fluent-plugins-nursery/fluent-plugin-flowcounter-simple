@@ -5,7 +5,7 @@ Simple Fluentd Plugin to count number of messages and outputs to log
 ## Output Plugin Configuration
 
     <match foo.bar.**>
-      type flowcounter_simple
+      @type flowcounter_simple
       unit second
     </match>
 
@@ -19,7 +19,7 @@ Fluentd >= v0.12
 
 ```apache
 <filter foo.bar.**>
-  type flowcounter_simple
+  @type flowcounter_simple
   unit second
 </filter>
 ```

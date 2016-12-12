@@ -56,7 +56,7 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
         d1.instance.flush_emit(60)
       end
     end
-    assert( out.include?("count:3360"), out )
+    assert( out.include?("count:3330"), out )
   end
 
   def test_comment

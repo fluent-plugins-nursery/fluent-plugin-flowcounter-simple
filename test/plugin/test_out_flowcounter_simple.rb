@@ -51,7 +51,7 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
       end
     end
     out = capture_log(d1.instance.log) { d1.instance.flush_emit(60) }
-    assert( out.include?("count:3360"), out )
+    assert( out =~ /count:\d+\tindicator:byte\tunit:second/, out )
   end
 
   def test_comment

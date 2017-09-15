@@ -26,20 +26,20 @@ class FlowCounterSimpleFilterTest < Test::Unit::TestCase
     d = create_driver
     filtered, out = filter(d, msgs)
     assert_equal msgs, filtered
-    assert( out.include?("count:20"), out )
+    assert { out.include?("count:20") }
   end
 
   private
 
   def filter(d,  msgs)
-    stub(d.instance.output).start
-    stub(d.instance.output).shutdown
+    stub(d.instance).start
+    stub(d.instance).shutdown
     d.run {
       msgs.each {|msg|
         d.filter(msg, @time)
       }
     }
-    out = capture_log(d.instance.output.log) do
+    out = capture_log(d.instance.log) do
       d.instance.flush_emit(0)
     end
     filtered = d.filtered_as_array

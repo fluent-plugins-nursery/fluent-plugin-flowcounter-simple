@@ -1,21 +1,12 @@
-# Be lazy to to implement filter plugin, use output plugin instance
-require_relative 'out_flowcounter_simple'
-require 'forwardable'
+require_relative 'flowcounter_simple'
 
 class Fluent::FlowCounterSimpleFilter < Fluent::Filter
   Fluent::Plugin.register_filter('flowcounter_simple', self)
 
-  extend Forwardable
-  attr_reader :output
-  def_delegators :@output, :configure, :start, :shutdown, :flush_emit
-
-  def initialize
-    super
-    @output = Fluent::FlowCounterSimpleOutput.new
-  end
+  include ::Fluent::FlowcounterSimple
 
   def filter_stream(tag, es)
-    @output.emit(tag, es, Fluent::NullOutputChain.instance)
+    process(tag, es)
     es
   end
 end if defined?(Fluent::Filter)

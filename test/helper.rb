@@ -17,11 +17,18 @@ require 'fluent/plugin/filter_flowcounter_simple'
 
 class Test::Unit::TestCase
   def capture_log(log)
-    tmp = log.out
-    log.out = StringIO.new
-    yield
-    return log.out.string
-  ensure
-    log.out = tmp
+    if defined?(Fluent::Test::TestLogger) and log.is_a?(Fluent::Test::TestLogger) # v0.14
+      yield
+      log.out.logs.join("\n")
+    else
+      begin
+        tmp = log.out
+        log.out = StringIO.new
+        yield
+        return log.out.string
+      ensure
+        log.out = tmp
+      end
+    end
   end
 end

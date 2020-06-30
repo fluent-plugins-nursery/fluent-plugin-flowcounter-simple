@@ -1,12 +1,15 @@
+require 'fluent/plugin/filter'
 require_relative 'flowcounter_simple'
 
-class Fluent::FlowCounterSimpleFilter < Fluent::Filter
-  Fluent::Plugin.register_filter('flowcounter_simple', self)
+module Fluent::Plugin
+  class FlowCounterSimpleFilter < Filter
+    Fluent::Plugin.register_filter('flowcounter_simple', self)
 
-  include ::Fluent::FlowcounterSimple
+    include ::Fluent::FlowcounterSimple
 
-  def filter_stream(tag, es)
-    process(tag, es)
-    es
+    def filter_stream(tag, es)
+      process_count(tag, es)
+      es
+    end
   end
-end if defined?(Fluent::Filter)
+end

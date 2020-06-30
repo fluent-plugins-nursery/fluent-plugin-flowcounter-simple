@@ -1,8 +1,11 @@
+require 'fluent/plugin_helper/thread'
+
 module Fluent
   module FlowcounterSimple
     attr_accessor :last_checked
 
     def self.included(klass)
+      klass.helpers :thread
       klass.config_param :indicator, :string, :default => 'num'
       klass.config_param :unit, :string, :default => 'second'
       klass.config_param :comment, :string, :default => nil
@@ -13,8 +16,14 @@ module Fluent
 
       @indicator_proc =
         case @indicator
-        when 'num'  then Proc.new {|record| 1 }
-        when 'byte' then Proc.new {|record| record.to_msgpack.size }
+        when 'num'  then Proc.new { |es| es.size }
+        when 'byte' then Proc.new { |es|
+                           count = 0
+                           es.each { |time, record|
+                             count += record.to_msgpack.size
+                           }
+                           count
+                         }
         else
           raise Fluent::ConfigError, "flowcounter-simple count allows num/byte"
         end
@@ -34,14 +43,15 @@ module Fluent
         when :hour then 3600
         when :day then 86400
         else
-          raise RuntimeError, "@unit must be one of second/minute/hour/day"
+          raise Fluent::ConfigError, "@unit must be one of second/minute/hour/day"
         end
 
+      @type_str = self.is_a?(Fluent::Plugin::Filter) ? 'filter' : 'out'
       @output_proc =
         if @comment
-          Proc.new {|count| "plugin:out_flowcounter_simple\tcount:#{count}\tindicator:#{@indicator}\tunit:#{@unit}\tcomment:#{@comment}" }
+          Proc.new { |count| "plugin:#{@type_str}_flowcounter_simple\tcount:#{count}\tindicator:#{@indicator}\tunit:#{@unit}\tcomment:#{@comment}" }
         else
-          Proc.new {|count| "plugin:out_flowcounter_simple\tcount:#{count}\tindicator:#{@indicator}\tunit:#{@unit}" }
+          Proc.new { |count| "plugin:#{@type_str}_flowcounter_simple\tcount:#{count}\tindicator:#{@indicator}\tunit:#{@unit}" }
         end
 
       @count = 0
@@ -50,13 +60,11 @@ module Fluent
 
     def start
       super
-      start_watch
+      thread_create(:flowcounter_simple_watch, &method(:watch))
     end
 
     def shutdown
       super
-      @watcher.terminate
-      @watcher.join
     end
 
     def countup(count)
@@ -72,30 +80,21 @@ module Fluent
       end
     end
 
-    def start_watch
-      # for internal, or tests only
-      @watcher = Thread.new(&method(:watch))
-    end
-
     def watch
       # instance variable, and public accessable, for test
-      @last_checked = Fluent::Engine.now
-      while true
+      @last_checked = Fluent::EventTime.now
+      while thread_current_running?
         sleep 0.1
-        if Fluent::Engine.now - @last_checked >= @tick
-          now = Fluent::Engine.now
+        if Fluent::EventTime.now - @last_checked >= @tick
+          now = Fluent::EventTime.now
           flush_emit(now - @last_checked)
           @last_checked = now
         end
       end
     end
 
-    def process(tag, es)
-      count = 0
-      es.each {|time,record|
-        count += @indicator_proc.call(record)
-      }
-      countup(count)
+    def process_count(tag, es)
+      countup(@indicator_proc.call(es))
     end
   end
 end

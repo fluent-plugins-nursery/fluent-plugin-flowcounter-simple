@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 Gem::Specification.new do |gem|
   gem.name        = "fluent-plugin-flowcounter-simple"
-  gem.version     = "0.0.4"
+  gem.version     = "0.1.0"
   gem.authors     = ["Naotoshi Seo"]
   gem.email       = ["sonots@gmail.com"]
   gem.summary     = %q{Simple Fluentd Plugin to count number of messages and outputs to log}

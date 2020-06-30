@@ -1,3 +1,7 @@
+## 0.1.0 (2020/06/30)
+
+* Use fluentd v1 API (repeatedly)
+
 ## 0.0.4 (2015/04/24)
 
 Enhancements:

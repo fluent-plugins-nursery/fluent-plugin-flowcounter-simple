@@ -1,5 +1,6 @@
 require_relative '../helper'
-require "test/unit/rr"
+require 'fluent/test/driver/filter'
+require 'fluent/plugin/filter_flowcounter_simple'
 
 class FlowCounterSimpleFilterTest < Test::Unit::TestCase
   include Fluent
@@ -14,7 +15,7 @@ class FlowCounterSimpleFilterTest < Test::Unit::TestCase
   ]
 
   def create_driver(conf = CONFIG)
-    Fluent::Test::FilterTestDriver.new(Fluent::FlowCounterSimpleFilter).configure(conf, true)
+    Fluent::Test::Driver::Filter.new(Fluent::Plugin::FlowCounterSimpleFilter).configure(conf)
   end
 
   def test_filter
@@ -32,18 +33,14 @@ class FlowCounterSimpleFilterTest < Test::Unit::TestCase
   private
 
   def filter(d,  msgs)
-    stub(d.instance).start
-    stub(d.instance).shutdown
-    d.run {
+    d.run(default_tag: 'test') {
       msgs.each {|msg|
-        d.filter(msg, @time)
+        d.feed(msg)
       }
     }
     out = capture_log(d.instance.log) do
       d.instance.flush_emit(0)
     end
-    filtered = d.filtered_as_array
-    filtered_msgs = filtered.map {|m| m[2] }
-    [filtered_msgs, out]
+    [d.filtered_records, out]
   end
-end if defined?(Fluent::Filter)
+end

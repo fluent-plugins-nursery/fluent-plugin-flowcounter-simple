@@ -1,4 +1,6 @@
 require_relative '../helper'
+require 'fluent/test/driver/output'
+require 'fluent/plugin/out_flowcounter_simple'
 
 class FlowCounterSimpleOutputTest < Test::Unit::TestCase
   def setup
@@ -10,7 +12,7 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
   ]
 
   def create_driver(conf=CONFIG,tag='test')
-    Fluent::Test::OutputTestDriver.new(Fluent::FlowCounterSimpleOutput, tag).configure(conf)
+    Fluent::Test::Driver::Output.new(Fluent::Plugin::FlowCounterSimpleOutput).configure(conf)
   end
 
   def test_configure
@@ -29,12 +31,12 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
   end
 
   def test_num
-    d1 = create_driver(CONFIG, 'test.tag1')
-    d1.run do
+    d1 = create_driver(CONFIG)
+    d1.run(default_tag: 'test.tag1') do
       10.times do
-        d1.emit({'message'=> 'a' * 100})
-        d1.emit({'message'=> 'b' * 100})
-        d1.emit({'message'=> 'c' * 100})
+        d1.feed({'message'=> 'a' * 100})
+        d1.feed({'message'=> 'b' * 100})
+        d1.feed({'message'=> 'c' * 100})
       end
     end
     out = capture_log(d1.instance.log) { d1.instance.flush_emit(60) }
@@ -42,12 +44,12 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
   end
 
   def test_byte
-    d1 = create_driver(CONFIG + %[indicator byte], 'test.tag1')
-    d1.run do
+    d1 = create_driver(CONFIG + %[indicator byte])
+    d1.run(default_tag: 'test.tag1') do
       10.times do
-        d1.emit({'message'=> 'a' * 100})
-        d1.emit({'message'=> 'b' * 100})
-        d1.emit({'message'=> 'c' * 100})
+        d1.feed({'message'=> 'a' * 100})
+        d1.feed({'message'=> 'b' * 100})
+        d1.feed({'message'=> 'c' * 100})
       end
     end
     out = capture_log(d1.instance.log) { d1.instance.flush_emit(60) }
@@ -55,12 +57,12 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
   end
 
   def test_comment
-    d1 = create_driver(CONFIG + %[comment foobar], 'test.tag1')
-    d1.run do
+    d1 = create_driver(CONFIG + %[comment foobar])
+    d1.run(default_tag: 'test.tag1') do
       1.times do
-        d1.emit({'message'=> 'a' * 100})
-        d1.emit({'message'=> 'b' * 100})
-        d1.emit({'message'=> 'c' * 100})
+        d1.feed({'message'=> 'a' * 100})
+        d1.feed({'message'=> 'b' * 100})
+        d1.feed({'message'=> 'c' * 100})
       end
     end
     out = capture_log(d1.instance.log) { d1.instance.flush_emit(60) }

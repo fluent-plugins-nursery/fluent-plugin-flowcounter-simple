@@ -1,17 +1,22 @@
+require 'fluent/plugin/output'
 require_relative 'flowcounter_simple'
 
-class Fluent::FlowCounterSimpleOutput < Fluent::Output
-  Fluent::Plugin.register_output('flowcounter_simple', self)
+module Fluent::Plugin
+  class FlowCounterSimpleOutput < Output
+    Fluent::Plugin.register_output('flowcounter_simple', self)
 
-  # To support log_level option implemented by Fluentd v0.10.43
-  unless method_defined?(:log)
-    define_method("log") { $log }
-  end
+    include ::Fluent::FlowcounterSimple
 
-  include ::Fluent::FlowcounterSimple
+    def prefer_buffered_processing
+      false
+    end
 
-  def emit(tag, es, chain)
-    process(tag, es)
-    chain.next
+    def multi_workers_ready?
+      true
+    end
+
+    def process(tag, es)
+      process_count(tag, es)
+    end
   end
 end

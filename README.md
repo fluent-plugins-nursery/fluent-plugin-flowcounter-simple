@@ -2,20 +2,14 @@
 
 Simple Fluentd Plugin to count number of messages and outputs to log
 
-## Output Plugin Configuration
+## Requirements
 
-    <match foo.bar.**>
-      type flowcounter_simple
-      unit second
-    </match>
-
-This plugin does not emit, just writes counts into the log file as
-
-    plugin:out_flowcounter_simple  count:30  indicator:num  unit:second
+| fluent-plugin-flowcounter-simple  | fluentd | ruby |
+|-------------------|---------|------|
+| >= 0.1.0 | >= v1.0 | >= 2.4 |
+|  < 0.0.4 | >= v0.12.0 | >= 2.1 |
 
 ## Filter Plugin Configuration
-
-Fluentd >= v0.12
 
 ```apache
 <filter foo.bar.**>
@@ -25,6 +19,17 @@ Fluentd >= v0.12
 ```
 
 This filter plugin pass through records, and writes counts into the log file as
+
+    plugin:out_flowcounter_simple  count:30  indicator:num  unit:second
+
+## Output Plugin Configuration
+
+    <match foo.bar.**>
+      type flowcounter_simple
+      unit second
+    </match>
+
+This plugin does not emit, just writes counts into the log file as
 
     plugin:out_flowcounter_simple  count:30  indicator:num  unit:second
 

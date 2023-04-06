@@ -3,6 +3,8 @@ require 'fluent/test/driver/output'
 require 'fluent/plugin/out_flowcounter_simple'
 
 class FlowCounterSimpleOutputTest < Test::Unit::TestCase
+  include Helper
+
   def setup
     Fluent::Test.setup
   end
@@ -38,9 +40,10 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
         d1.feed({'message'=> 'b' * 100})
         d1.feed({'message'=> 'c' * 100})
       end
+      d1.instance.flush_emit(60)
     end
-    out = capture_log(d1.instance.log) { d1.instance.flush_emit(60) }
-    assert { out.include?("count:30") }
+    assert_equal(["plugin:out_flowcounter_simple\tcount:30\tindicator:num\tunit:second\n"],
+                 normalize_logs(d1.logs))
   end
 
   def test_byte
@@ -51,9 +54,10 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
         d1.feed({'message'=> 'b' * 100})
         d1.feed({'message'=> 'c' * 100})
       end
+      d1.instance.flush_emit(60)
     end
-    out = capture_log(d1.instance.log) { d1.instance.flush_emit(60) }
-    assert { out =~ /count:\d+\tindicator:byte\tunit:second/ }
+    assert_equal(["plugin:out_flowcounter_simple\tcount:3330\tindicator:byte\tunit:second\n"],
+                 normalize_logs(d1.logs))
   end
 
   def test_comment
@@ -64,8 +68,9 @@ class FlowCounterSimpleOutputTest < Test::Unit::TestCase
         d1.feed({'message'=> 'b' * 100})
         d1.feed({'message'=> 'c' * 100})
       end
+      d1.instance.flush_emit(60)
     end
-    out = capture_log(d1.instance.log) { d1.instance.flush_emit(60) }
-    assert { out.include?("comment:foobar") }
+    assert_equal(["plugin:out_flowcounter_simple\tcount:3\tindicator:num\tunit:second\tcomment:foobar\n"],
+                 normalize_logs(d1.logs))
   end
 end

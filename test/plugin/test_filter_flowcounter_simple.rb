@@ -4,6 +4,7 @@ require 'fluent/plugin/filter_flowcounter_simple'
 
 class FlowCounterSimpleFilterTest < Test::Unit::TestCase
   include Fluent
+  include Helper
 
   def setup
     Fluent::Test.setup
@@ -25,9 +26,10 @@ class FlowCounterSimpleFilterTest < Test::Unit::TestCase
       msgs << {'message'=> 'b' * 100}
     end
     d = create_driver
-    filtered, out = filter(d, msgs)
+    filtered, logs = filter(d, msgs)
     assert_equal msgs, filtered
-    assert { out.include?("count:20") }
+    assert_equal(["plugin:filter_flowcounter_simple\tcount:20\tindicator:num\tunit:second\n"],
+                 normalize_logs(logs))
   end
 
   private
@@ -37,10 +39,8 @@ class FlowCounterSimpleFilterTest < Test::Unit::TestCase
       msgs.each {|msg|
         d.feed(msg)
       }
-    }
-    out = capture_log(d.instance.log) do
       d.instance.flush_emit(0)
-    end
-    [d.filtered_records, out]
+    }
+    [d.filtered_records, d.logs]
   end
 end

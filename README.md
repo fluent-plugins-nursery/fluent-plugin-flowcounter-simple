@@ -1,4 +1,6 @@
-# fluent-plugin-flowcounter-simple [![Build Status](https://secure.travis-ci.org/sonots/fluent-plugin-flowcounter-simple.png?branch=master)](http://travis-ci.org/sonots/fluent-plugin-flowcounter-simple)
+# fluent-plugin-flowcounter-simple
+
+[![Test](https://github.com/fluent-plugins-nursery/fluent-plugin-flowcounter-simple/actions/workflows/test.yaml/badge.svg)](https://github.com/fluent-plugins-nursery/fluent-plugin-flowcounter-simple/actions/workflows/test.yaml)
 
 Simple Fluentd Plugin to count number of messages and outputs to log
 
